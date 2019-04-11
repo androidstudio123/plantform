@@ -1,0 +1,54 @@
+server:
+  port: 8671
+  tomcat:
+    uri-encoding: UTF-8
+
+##数据库
+#数据库设置
+spring:
+  resources:
+    static-locations: classpath:static/,file:static/
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://114.116.74.150:3306/yr_repair?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+    username: root
+    password: statc_mysql_150.cjzbtptp#
+    hikari:
+        minimum-idle: 5
+        maximum-pool-size: 15
+        auto-commit: true
+        idle-timeout: 30000
+        pool-name: DatebookHikariCP
+        max-lifetime: 1800000
+        connection-timeout: 30000
+        connection-test-query: SELECT 1
+##mybatis&&通用Mapper
+mybatis:
+  type-aliases-package: cn.crm.mapper
+  mapper-locations:
+  - classpath:mapper/*.xml
+  - classpath:mapper/repair/*.xml
+  - classpath:mapper/terrace/*.xml
+  - classpath:mapper/materiel/*.xml
+mapper:
+  mappers:
+  - tk.mybatis.mapper.common.Mapper
+  identity:   MYSQL
+
+##分页插件设置
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+  params: countSql
+  
+##打印sql语句
+logging:
+  level:
+     cn.crm.mapper : debug
+  config: classpath:logback-spring.xml
+
+
+     
+     

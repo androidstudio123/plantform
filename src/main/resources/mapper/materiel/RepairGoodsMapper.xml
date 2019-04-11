@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.crm.mapper.materiel.RepairGoodsMapper" >
+
+
+    <!--根据当前登录管理员信息,查询其管理的库存(适用于普通管理员)-->
+    <select id="findAllGoodsByAdmin" resultType="cn.crm.entity.materiel.RepairGoodsEntity">
+        <!-- a 	repair_goods 					  物料表 -->
+        <!-- b	repair_goods_ repertory_name      库名称表 -->
+        <!-- c 	repair_goods_producer			  生产厂家表 -->
+        <!-- d	repair_goods_repertory_type 	库类型表-->
+        <!-- e	repair_goods_type				物品分类表-->
+        SELECT
+            a.*,
+            <!-- 库名称 -->
+            b.repertory_name,
+            <!-- 生产厂家名称-->
+            c.producer_name,
+            <!-- 库类型名称 -->
+            d.repertory_type_name,
+            <!-- 物品分类名称 -->
+            e.goods_type_name
+        FROM
+            repair_goods AS a
+            LEFT JOIN `repair_goods_ repertory_name` AS b ON a.repertory_name_id = b.repertory_name_id
+            LEFT JOIN repair_goods_producer AS c ON a.producer_id = c.producer_id
+            LEFT JOIN repair_goods_repertory_type AS d ON a.repertory_type_id = d.repertory_type_id
+            LEFT JOIN repair_goods_type AS e ON a.goods_type_id = e.goods_type_id
+        <where>
+        <!-- 根据指定的库名称筛选查询 -->
+        <if test="repertoryNameId != null">
+            AND a.repertory_name_id = #{repertoryNameId}
+            AND a.repertory_type_id IN
+            <foreach collection="configByAdmin" item="item" index="index" open="(" close=")" separator=",">
+                #{item.repertory_type_id}
+            </foreach>
+            ORDER BY a.repertory_name_id,a.repertory_type_id,a.goods_type_id
+        </if>
+        <!-- 根据管理员拥有的权限查询 -->
+        <if test="repertoryNameId == null">
+            <foreach collection="configByAdmin" item="item">
+                OR
+                ( a.repertory_type_id  = #{item.repertory_type_id}  AND
+                a.repertory_name_id = #{item.repertory_name_id} )
+            </foreach>
+            ORDER BY a.repertory_name_id,a.repertory_type_id,a.goods_type_id
+        </if>
+        </where>
+    </select>
+
+
+    <!--查询所有库存信息,不再已权限区分(针对于admin管理员)-->
+    <select id="findAllGoods" resultType="cn.crm.entity.materiel.RepairGoodsEntity">
+        <!-- a 	repair_goods 					  物料表 -->
+        <!-- b	repair_goods_ repertory_name      库名称表 -->
+        <!-- c 	repair_goods_producer			  生产厂家表 -->
+        <!-- d	repair_goods_repertory_type 	库类型表-->
+        <!-- e	repair_goods_type				物品分类表-->
+        SELECT
+        a.*,
+        <!-- 库名称 -->
+        b.repertory_name,
+        <!-- 生产厂家名称-->
+        c.producer_name,
+        <!-- 库类型名称 -->
+        d.repertory_type_name,
+        <!-- 物品分类名称 -->
+        e.goods_type_name
+        FROM
+        repair_goods AS a
+        LEFT JOIN `repair_goods_ repertory_name` AS b ON a.repertory_name_id = b.repertory_name_id
+        LEFT JOIN repair_goods_producer AS c ON a.producer_id = c.producer_id
+        LEFT JOIN repair_goods_repertory_type AS d ON a.repertory_type_id = d.repertory_type_id
+        LEFT JOIN repair_goods_type AS e ON a.goods_type_id = e.goods_type_id
+        WHERE 1 = 1
+        <if test="repertoryNameId != null">
+            AND a.repertory_name_id = #{repertoryNameId}
+        </if>
+        ORDER BY a.repertory_name_id,a.repertory_type_id,a.goods_type_id
+    </select>
+
+
+    <!--根据当前登录管理员信息,统计物品数量(针对admin管理员)-->
+    <select id="countGoods" resultType="int">
+        SELECT SUM(num) FROM repair_goods
+        <where>
+            <!-- 物品名称筛选查询 -->
+            <if test="goodsName != null and goodsName != '' ">
+                AND goods_name = #{goodsName}
+            </if>
+            <!-- 物品分类筛选查询 -->
+            <if test="goodsTypeId != null">
+                AND goods_type_id = #{goodsTypeId}
+            </if>
+            <!-- 生产厂家筛选查询 -->
+            <if test="producerId != null">
+                AND producer_id = #{producerId}
+            </if>
+            <!-- 库名称筛选查询 -->
+            <if test="repertoryNameId != null">
+                AND repertory_name_id = #{repertoryNameId}
+            </if>
+            <!-- 库类型筛选查询 -->
+            <if test="repertoryTypeId != null">
+                AND repertory_type_id = #{repertoryTypeId}
+            </if>
+        </where>
+    </select>
+
+    <!--根据当前登录管理员信息,统计物品数量(针对普通管理员)-->
+    <select id="countGoodsByAdmin" resultType="int">
+
+          SELECT  SUM(num)  FROM  repair_goods  AS a
+            <where>
+                <foreach collection="configByAdmin" item="item">
+                    OR
+                    ( repertory_type_id  = #{item.repertory_type_id}  AND
+                    repertory_name_id = #{item.repertory_name_id} )
+                </foreach>
+
+            <!-- 物品名称筛选查询 -->
+            <if test="goodsName != null and goodsName != '' ">
+                AND a.goods_name = #{goodsName}
+            </if>
+            <!-- 物品分类筛选查询 -->
+            <if test="goodsTypeId != null">
+                AND a.goods_type_id = #{goodsTypeId}
+            </if>
+            <!-- 生产厂家筛选查询 -->
+            <if test="producerId != null">
+                AND a.producer_id = #{producerId}
+            </if>
+            <!-- 库名称筛选查询 -->
+            <if test="repertoryNameId != null">
+                AND a.repertory_name_id = #{repertoryNameId}
+            </if>
+            <!-- 库类型筛选查询 -->
+            <if test="repertoryTypeId != null">
+                AND a.repertory_type_id = #{repertoryTypeId}
+            </if>
+        </where>
+
+    </select>
+	
+	
+</mapper>

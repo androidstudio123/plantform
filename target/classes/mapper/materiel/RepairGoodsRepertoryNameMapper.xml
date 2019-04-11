@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.crm.mapper.materiel.RepairGoodsRepertoryNameMapper" >
+
+    <!--根据库管角色查询其管理的库-->
+    <select id="findRepertoryNameByRoleId" resultType="cn.crm.entity.materiel.RepairGoodsRepertoryNameEntity">
+        SELECT
+	      b.*
+        FROM
+        repertory_export_role_config AS a
+        LEFT JOIN `repair_goods_ repertory_name` AS b ON a.repertory_name_id = b.repertory_name_id
+        WHERE
+        a.export_role_id = #{export_role_id}
+        GROUP BY b.repertory_name_id
+
+    </select>
+	
+	
+</mapper>

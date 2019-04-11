@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.crm.mapper.sys.SysUserRoomMapper" >
+
+    <delete id="deleteByAdminId">
+        DELETE ur.*
+        FROM
+        sys_user_room ur
+        INNER JOIN sys_user u ON ur.user_id = u.user_id
+        INNER JOIN sys_admin_usergroup ug ON u.userGroup_id = ug.userGroup_id
+        WHERE ug.admin_id = #{adminId} AND ur.room_id = #{roomId}
+    </delete>
+
+
+    <select id="findCountByRoomId">
+      SELECT COUNT(ur.room_id) FROM sys_user_room ur INNER JOIN sys_user u ON ur.user_id = u.user_id WHERE ur.room_id = #{roomId}
+    </select>
+
+</mapper>

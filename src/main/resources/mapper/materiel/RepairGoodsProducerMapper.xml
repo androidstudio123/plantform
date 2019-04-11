@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.crm.mapper.materiel.RepairGoodsProducerMapper" >
+
+    <!--根据库名称,库类型以及物品类型查询对应的生产厂家(手机端出库使用)-->
+    <select id="findByCondition" resultType="cn.crm.entity.materiel.RepairGoodsProducerEntity">
+        SELECT
+            b.*
+        FROM
+            repair_goods AS a
+            LEFT JOIN repair_goods_producer AS b ON a.producer_id = b.producer_id
+        WHERE
+            a.repertory_name_id = #{repertoryNameId}
+            AND a.goods_type_id = #{goodsTypeId}
+            AND a.repertory_type_id = #{repertoryTypeId}
+            GROUP BY b.producer_id
+
+    </select>
+	
+	
+</mapper>

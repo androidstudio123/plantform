@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.crm.mapper.terrace.RepairModuleMapper" >
+    <!--查询所有模块信息-->
+      <select id="findAllModule" resultType="cn.crm.vo.ModuleVo">
+              SELECT
+	              a.*,
+	              GROUP_CONCAT( DISTINCT b.school_id ) as schoolIds
+              FROM
+	              repair_module AS a
+	          LEFT JOIN repair_school_module AS b ON a.id = b.module_id
+            WHERE
+	            a.id IN ( SELECT module_id FROM repair_school_module WHERE school_id IN
+            <foreach collection="schoolIds" item="schoolId" index="index" open="(" close=")" separator=",">
+                #{schoolId}
+            </foreach> )
+                <if test="module_status != null">
+                    and a.module_status=#{module_status}
+                </if>
+              <if test="module_name != null">
+                  and a.module_name like  concat('%',#{module_name},'%')
+              </if>
+            GROUP BY
+	            a.id
+      </select>
+     <!--根据模块id查询模块信息-->
+    <select id="findModuleById" resultType="cn.crm.vo.ModuleVo" parameterType="int">
+            SELECT
+                a.*,
+                GROUP_CONCAT( b.school_id ) as schoolIds
+            FROM
+                repair_module AS a
+                LEFT JOIN repair_school_module AS b ON a.id = b.module_id
+            WHERE
+                a.id =#{id}
+    </select>
+	
+</mapper>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.crm.mapper.repair.RepairRoleOrderTypeMapper" >
+
+    <!--根据用户查询此用户所负责的工单类型-->
+    <select id="findOrderTypeByUser" resultType="int">
+        SELECT
+	      order_type_id
+        FROM
+	      repair_role_order_type
+        WHERE
+	      role_id = ( SELECT role_id FROM sys_user WHERE user_id = #{userId} )
+    </select>
+	
+	
+</mapper>

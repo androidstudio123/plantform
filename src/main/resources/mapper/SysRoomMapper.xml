@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.crm.mapper.sys.SysRoomMapper"  >
+    <select id="findListRoom" resultType="cn.crm.entity.SysRoomEntity">
+        SELECT r.* FROM sys_room r WHERE r.roomGroup_id IN
+
+        <foreach collection="childrenIds" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+
+        <if test="imei != null and imei != ''">
+            and r.room_imei LIKE CONCAT(#{imei},"%")
+        </if>
+        <if test="roomName != null and roomName != ''">
+            and r.room_name LIKE CONCAT(#{room_name},"%")
+        </if>
+    </select>
+	
+	
+</mapper>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.crm.mapper.terrace.RepairArticleTypeMapper" >
+           <!--查询所有文章类型信息-->
+	     <select id="findAllArticleType" resultType="cn.crm.vo.ArticleTypeVo">
+             SELECT
+             a.*,
+             GROUP_CONCAT( DISTINCT b.school_id ) AS schoolIds
+             FROM
+             repair_article_type AS a
+             LEFT JOIN repair_school_article AS b ON a.id = b.article_id
+             WHERE
+             a.id IN (
+             SELECT
+             article_id
+             FROM
+             repair_school_article
+             WHERE
+             school_id IN
+             <foreach collection="schoolIds" item="schoolId" index="index" open="(" close=")" separator=",">
+                 #{schoolId}
+             </foreach>
+             )
+             <if test="articleType_state != null">
+                 and a.articleType_state=#{articleType_state}
+             </if>
+             <if test="articleType_title != null">
+                 and a.articleType_title like  concat('%',#{articleType_title},'%')
+             </if>
+             GROUP BY
+             a.id
+         </select>
+
+
+     <!--根据文章类型id查询文章类型信息-->
+    <select id="findArticleTypeById" resultType="cn.crm.vo.ArticleTypeVo" parameterType="int">
+            SELECT
+                a.*,
+                GROUP_CONCAT( b.school_id ) as schoolIds
+            FROM
+                repair_article_type AS a
+                LEFT JOIN repair_school_article AS b ON a.id = b.article_id
+            WHERE
+                a.id =#{id}
+    </select>
+
+</mapper>

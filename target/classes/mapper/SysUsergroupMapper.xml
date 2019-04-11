@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.crm.mapper.sys.SysUsergroupMapper" >
+
+    <!--根据管理员id查询对应的用户组信息-->
+    <select id="findUsergroup" resultType="cn.crm.vo.SysUsergroupVo" parameterType="int">
+        SELECT a.admin_id,a.userGroup_id as group_id ,b.* FROM sys_admin_usergroup AS a LEFT JOIN sys_usergroup AS b  ON a.userGroup_id =b.userGroup_id WHERE a.admin_id =#{admin_id}
+    </select>
+    <!--查询此分组是否有下级-->
+    <select id="findUsergroupByGroupid" resultType="cn.crm.entity.SysUsergroupEntity" parameterType="int">
+        SELECT a.*,b.* FROM sys_usergroup AS a INNER JOIN sys_usergroup AS b ON a.userGroup_id =b.userGroup_parentId WHERE a.userGroup_id = #{userGroup_id}
+    </select>
+
+    <!--根据管理员id查询对应的用户组信息-->
+    <select id="findUsergroupsByAdaminId" resultType="cn.crm.vo.SysUsergroupVo" parameterType="int">
+        SELECT b.* FROM sys_admin_usergroup AS a inner   JOIN sys_usergroup AS b  ON a.userGroup_id =b.userGroup_id WHERE a.admin_id =#{adminId}
+    </select>
+
+    <!--查询该id的子级id-->
+    <select id="findNextUserGroupId" resultType="int" parameterType="int">
+        SELECT userGroup_id FROM sys_usergroup WHERE userGroup_parentId = #{userGroup_id}
+    </select>
+
+    <!--根据管理员id查询对应的学校id信息-->
+    <select id="findSchoolId" resultType="integer" parameterType="int">
+        SELECT  DISTINCT b.school_id FROM sys_admin_usergroup AS a LEFT JOIN sys_usergroup AS b  ON a.userGroup_id =b.userGroup_id WHERE a.admin_id =#{admin_id} AND b.school_id IS NOT NULL
+    </select>
+
+      <!--根据学校id查询对应的分组id并且父类id为0-->
+    <select id="findUserGroupId" resultType="int" parameterType="int">
+        SELECT userGroup_id FROM sys_usergroup WHERE school_id =#{school_id} AND userGroup_parentId = 0
+    </select>
+</mapper>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.crm.mapper.sys.SysUserMapper" >
+	      <!--根据管理员id查询对应的所有用户信息-->
+    <select id="findAllUser" resultType="cn.crm.entity.SysUserEntity">
+            SELECT * FROM sys_user WHERE user_group_id IN (SELECT userGroup_id FROM sys_admin_usergroup WHERE admin_id = #{admin_id} and state = 1)
+                <if test="user_name != null and user_name != ''">
+                    and user_name  like concat('%',#{user_name},'%')
+                </if>
+    </select>
+
+    <!--根据管理员id查询对应的所有用户信息-->
+    <select id="finduser" resultType="int" parameterType="int">
+        SELECT user_id FROM sys_user WHERE user_group_id IN (SELECT userGroup_id FROM sys_admin_usergroup WHERE admin_id = #{admin_id} and state = 1)
+    </select>
+
+
+
+    <select id="findUserBySchoolId" resultType="cn.crm.entity.SysUserEntity" parameterType="int">
+        SELECT a.* FROM sys_user_group AS a LEFT JOIN sys_user AS b ON a.userGroup_id =b.user_group_id WHERE a.school_id = #{schoolId}
+    </select>
+
+    <!--根据故障地点与故障类型,查询对应的维修工OpenId-->
+    <select id="findOpenIdByAreaAndOrderType" resultType="string">
+        SELECT
+            user_openId
+        FROM
+            sys_user
+        WHERE
+            role_id IN (
+            SELECT
+                a.role_id
+            FROM
+                repair_role_area AS a
+                LEFT JOIN repair_role_order_type AS b ON a.role_id = b.role_id
+                LEFT JOIN repair_role_function AS c ON a.role_id = c.role_Id
+            WHERE
+                a.area_id = #{areaId}
+                AND b.order_type_id = #{fixTypeId}
+                <!-- 查询拥有功能7,也就是此用户有接单按钮权限的-->
+                AND c.function_id = 7
+            )
+
+    </select>
+</mapper>

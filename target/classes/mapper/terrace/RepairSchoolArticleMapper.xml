@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.crm.mapper.terrace.RepairSchoolArticleMapper">
+
+    <!--根据学校ids查询对应文章类型ids-->
+    <select id="findArticleTypeId" resultType="integer" parameterType="list">
+             SELECT article_id FROM repair_school_article WHERE school_id IN
+        <foreach collection="school_id" item="schoolId" index="index" open="(" close=")" separator=",">
+            #{schoolId}
+        </foreach>
+         </select>
+
+    <!--根据学校id查询对应文章类型ids-->
+    <select id="findAppArticleTypeId" resultType="integer" parameterType="list">
+             SELECT article_id FROM repair_school_article WHERE school_id =#{school_id}
+         </select>
+</mapper>

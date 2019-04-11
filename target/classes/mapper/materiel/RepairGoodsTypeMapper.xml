@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.crm.mapper.materiel.RepairGoodsTypeMapper" >
+
+    <!--根据库名称与库类型查询对应的物品分类(手机端出库使用)-->
+    <select id="findByCondition" resultType="cn.crm.entity.materiel.RepairGoodsTypeEntity">
+        SELECT
+            b.*
+        FROM
+            repair_goods AS a
+            INNER JOIN repair_goods_type AS b ON a.goods_type_id = b.goods_type_id
+        WHERE
+            a.repertory_name_id = #{repertoryNameId}
+            AND a.repertory_type_id = #{repertoryTypeId}
+            GROUP BY a.goods_type_id
+    </select>
+
+	
+</mapper>

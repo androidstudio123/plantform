@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.crm.mapper.materiel.RepairRepertoryAdminConfigVOMapper" >
+
+	<select id="findRepertoryAdminConfig" resultType="cn.crm.vo.RepairRepertoryAdminConfigVO">
+       	SELECT *,GROUP_CONCAT(DISTINCT e.admin_name) as admin_names FROM (SELECT a.*,b.repertory_name,c.repertory_type_name,d.admin_name
+        FROM repair_repertory_admin_config as a
+        LEFT JOIN `repair_goods_ repertory_name` as b on a.repertory_name_id = b.repertory_name_id
+        LEFT JOIN repair_goods_repertory_type as c on a.repertory_type_id = c.repertory_type_id
+        LEFT JOIN sys_admin as d on a.admin_id = d.admin_id) as e GROUP BY e.repertory_name_id
+    </select>
+</mapper>

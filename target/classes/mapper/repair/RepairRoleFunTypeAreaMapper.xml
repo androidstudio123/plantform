@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.crm.mapper.repair.RepairRoleFunTypeAreaMapper" >
+	
+	<select id="findPCRepairRole" resultType="cn.crm.entity.repair.RepairRoleFunTypeAreaEntity">
+					select m.role_id,m.role_name,m.f_id,m.f_name,m.role_flag,m.is_default,n.t_id,n.t_name,k.a_id,k.a_name from
+        (SELECT f.role_id,f.role_name,f.role_flag,f.is_default,GROUP_CONCAT(f.function_id) as f_id,GROUP_CONCAT(f.function_name) as f_name FROM
+        (SELECT a.*,c.function_id,c.function_name FROM repair_role a LEFT JOIN repair_role_function b on a.role_id=b.role_id LEFT JOIN repair_function c ON b.function_id = c.function_id )
+        as f GROUP BY f.role_id) as m LEFT JOIN
+        (SELECT f.role_id,f.role_name,GROUP_CONCAT(f.type_id) as t_id,GROUP_CONCAT(f.type_name) as t_name FROM
+        (SELECT a.*,c.type_id,c.type_name FROM repair_role a LEFT JOIN repair_role_order_type b on a.role_id=b.role_id LEFT JOIN order_type c ON b.order_type_id = c.type_id )
+        as f GROUP BY f.role_id) n on m.role_id=n.role_id
+        LEFT JOIN
+        (SELECT f.role_id,f.role_name,GROUP_CONCAT(f.area_id) as a_id,GROUP_CONCAT(f.area_name) as a_name FROM
+        (SELECT a.*,c.area_id,c.area_name FROM repair_role a LEFT JOIN repair_role_area b on a.role_id=b.role_id LEFT JOIN repair_area c ON b.area_id = c.area_id )
+        as f GROUP BY f.role_id) as k on n.role_id=k.role_id where m.role_name like concat("%",#{roleName},"%")
+    </select>
+</mapper>

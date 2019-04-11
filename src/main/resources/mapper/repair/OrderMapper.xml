@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.crm.mapper.repair.OrderMapper" >
+
+    <!--根据用户统计工单数量-->
+    <select id="countOrder" resultType="map">
+        <!-- 统计普通用户的报单数量 -->
+            <if test="areas == null and types == null">
+                SELECT
+                SUM(CASE WHEN DAY( create_time ) = DAY( CURDATE()) THEN 1 ELSE 0 END) AS 'day',
+                SUM(CASE WHEN MONTH( create_time ) = MONTH( CURDATE()) THEN 1 ELSE 0 END) AS 'month',
+                SUM(CASE WHEN WEEK( create_time ) = WEEK( CURDATE()) THEN 1 ELSE 0 END) AS 'week',
+                SUM(CASE WHEN YEAR( create_time ) = YEAR( CURDATE()) THEN 1 ELSE 0 END) AS 'year'
+                FROM `order`
+                WHERE school_id = #{schoolId}
+                AND bx_id = #{userId}
+            </if>
+        <!-- 统计工作人员的接单数量 -->
+            <if test="areas != null and types != null">
+                SELECT
+                SUM(CASE WHEN DAY( start_time ) = DAY( CURDATE()) THEN 1 ELSE 0 END) AS 'day',
+                SUM(CASE WHEN MONTH( start_time ) = MONTH( CURDATE()) THEN 1 ELSE 0 END) AS 'month',
+                SUM(CASE WHEN WEEK( start_time ) = WEEK( CURDATE()) THEN 1 ELSE 0 END) AS 'week',
+                SUM(CASE WHEN YEAR( start_time ) = YEAR( CURDATE()) THEN 1 ELSE 0 END) AS 'year'
+                FROM `order`
+                WHERE school_id = #{schoolId}
+                AND worker_id = #{userId}
+                AND area_id IN
+                    <foreach collection="areas" item="area" index="index" open="(" close=")" separator=",">
+                        #{area}
+                    </foreach>
+                AND fix_type_id IN
+                    <foreach collection="types" item="type" index="index" open="(" close=")" separator=",">
+                        #{type}
+                    </foreach>
+            </if>
+    </select>
+
+    <!--根据订单状态,查询此用户的订单情况(针对非普通用户,也就是工作人员)-->
+    <select id="appFindOrderByOrderStatus" resultType="map">
+        SELECT
+            o.*
+        FROM
+            `order` AS o
+            LEFT JOIN repair_area AS a ON o.area_id = a.area_id
+        WHERE
+              o.order_status = #{orderStatus}
+            <!-- 如果是待接单或者是待回访,那么就根据区域与类型查询 -->
+                <if test="areas != null and areas.size() > 0">
+                  AND o.area_id IN
+                  <foreach collection="areas" item="area" index="index" open="(" close=")" separator=",">
+                      #{area}
+                  </foreach>
+                </if>
+                <if test="types != null and types.size() > 0">
+                  AND fix_type_id IN
+                  <foreach collection="types" item="type" index="index" open="(" close=")" separator=",">
+                      #{type}
+                  </foreach>
+                </if>
+
+        <!-- 如果不是待接单和待回访,那就根据接单人查询 -->
+        <!-- 去掉自己报修的工单,因为在下面appFindOrderByOrderStatusCommen查询语句中已经包含了自己报修的工单 -->
+
+        <!--
+            <if test="orderStatus != 0 and orderStatus != 3">
+                AND o.worker_id = #{userId}
+            </if>
+            -->
+            AND o.bx_id != #{userId}
+            ORDER BY o.create_time DESC
+
+    </select>
+
+    <!--根据订单状态,查询此用户的订单情况(针对自己报修的工单)-->
+    <select id="appFindOrderByOrderStatusCommen" resultType="map">
+        SELECT
+            o.*
+        FROM
+            `order` AS o
+            LEFT JOIN repair_area AS a ON o.area_id = a.area_id
+        WHERE
+            o.order_status = #{orderStatus}
+            AND o.bx_id = #{userId}
+            ORDER BY o.create_time DESC
+    </select>
+
+
+    <!--根据工单ID查询工单详情-->
+    <select id="findOrderDetails" resultType="map">
+        <!-- a order 工单表 -->
+        <!-- b order_type 工单类型表 -->
+        <!-- c repair_area 故障区域表 -->
+        <!-- d order_comment 工单评论表  -->
+        <!-- e sys_user     用户表 -->
+        SELECT
+            a.*,
+            b.type_name,
+            c.area_name,
+            d.comment_content,
+            d.comment_time,
+            d.rank,
+            e.user_name,
+            e.user_nick,
+            e.user_phone,
+            e.user_avatar
+        FROM
+            `order` AS a
+            LEFT JOIN order_type AS b ON a.fix_type_id = b.type_id
+            LEFT JOIN repair_area AS c ON a.area_id = c.area_id
+            LEFT JOIN order_comment AS d ON d.order_id = a.order_id
+            LEFT JOIN sys_user AS e ON d.commentator_id = e.user_id
+        WHERE
+            a.order_id = #{orderId};
+    </select>
+
+    <!--手机端首页(统计有接单权限的用户接单的数量,其实就是统计该用户接单的数量)-->
+    <select id="appFindOrderByUserPower" resultType="map">
+        SELECT
+        order_status,
+                SUM(CASE WHEN DAY( start_time ) = DAY( CURDATE()) THEN 1 ELSE 0 END) AS 'day',
+                SUM(CASE WHEN MONTH( start_time ) = MONTH( CURDATE()) THEN 1 ELSE 0 END) AS 'month',
+                SUM(CASE WHEN WEEK( start_time ) = WEEK( CURDATE()) THEN 1 ELSE 0 END) AS 'week',
+                SUM(CASE WHEN YEAR( start_time ) = YEAR( CURDATE()) THEN 1 ELSE 0 END) AS 'year'
+                FROM `order`
+                WHERE
+                worker_id = #{userId}
+    </select>
+
+    <!--根据用户负责的区域以及类型统计待接单的数量-->
+    <select id="countUnreceivedOrders" resultType="map">
+        SELECT
+          order_status,
+          COUNT(order_id) AS num
+        FROM `order` AS o
+        WHERE
+          o.order_status = 0
+            <if test="areas != null and areas.size() > 0">
+                AND o.area_id IN
+                <foreach collection="areas" item="area" index="index" open="(" close=")" separator=",">
+                    #{area}
+                </foreach>
+            </if>
+            <if test="types != null and types.size() > 0">
+                AND fix_type_id IN
+                <foreach collection="types" item="type" index="index" open="(" close=")" separator=",">
+                    #{type}
+                </foreach>
+            </if>
+
+    </select>
+	
+	
+</mapper>

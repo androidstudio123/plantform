@@ -1,0 +1,39 @@
+package cn.crm.entity.terrace;
+
+import javax.persistence.Table;
+import javax.persistence.Column;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+
+/**
+ * TODO 在此加入类描述 学校和文章类型中间表实体类
+ * @copyright
+ * @author MYZ
+ * @version  2019-03-25 10:01:40
+
+ */
+
+@Data
+@Table(name="repair_school_article")
+@ApiModel(description = "学校和文章类型中间表类")
+public class RepairSchoolArticleEntity{
+		
+
+	/**
+	 * 文章类型id
+	 */
+	@Column(name = "article_id")
+	@ApiModelProperty(value = "文章类型id")
+	private Integer article_id;
+	/**
+	 * 学校id
+	 */
+	@Column(name = "school_id")
+	@ApiModelProperty(value = "学校id")
+	private Integer school_id;
+	
+	
+	
+}

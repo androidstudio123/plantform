@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.crm.mapper.repair.UserRoleGroupSchoolVoMapper" >
+	
+	<select id="findUserRoleGroupSchool" resultType="cn.crm.vo.UserRoleGroupSchoolVo">
+        SELECT a.*,b.userGroup_name,b.userGroup_state,c.role_name
+        FROM sys_user as a
+        LEFT JOIN sys_usergroup as b
+        on a.user_group_id = b.userGroup_id
+        LEFT JOIN repair_role as c
+        on a.role_Id = c.role_id
+        left join sys_admin_usergroup as d on a.user_group_id = d.userGroup_id left join sys_admin as e on d.admin_id = e.admin_id
+        WHERE 1=1
+            and d.admin_id=#{admin_id}
+            <if test="user_group_id != null">
+                and a.user_group_id = #{user_group_id}
+            </if>
+            <if test="user_name != null">
+                and a.user_name like concat("%",#{user_name},"%")
+            </if>
+    </select>
+</mapper>

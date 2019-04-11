@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.crm.mapper.repair.OrderAreaTypeUserVoMapper" >
+	<select id="findOrderManager" resultType="cn.crm.vo.OrderAreaTypeUserVo">
+
+        SELECT
+        a.order_id,a.order_no,a.order_status,a.create_time,a.start_time,a.finish_time,a.order_desc,a.area_name as a_name,a.bx_name,b.*,
+        c.type_id,c.type_name,d.user_name as baox_name,d.user_nick as baox_nick,
+        e.user_name as weix_name,e.user_nick as weix_nick,f.school_name,h.rank,h.comment_content
+        from `order` as a
+        LEFT JOIN repair_area as b on a.area_id = b.area_id
+        LEFT JOIN order_type as c on a.fix_type_id = c.type_id
+        left JOIN sys_user as d on a.bx_id = d.user_id
+        LEFT JOIN sys_user as e ON a.worker_id = e.user_id
+        LEFT JOIN school_config as f ON a.school_id=f.school_id
+        LEFT JOIN order_comment as h on a.order_id=h.order_id
+        WHERE 1=1
+              <if test="order_status!=null">
+                  and a.order_status = #{order_status}
+              </if>
+            <if test="order_no !=null">
+                and a.order_no = #{order_no}
+            </if>
+        order by create_time desc
+    </select>
+	
+</mapper>

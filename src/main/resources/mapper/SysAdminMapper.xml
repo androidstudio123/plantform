@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.crm.mapper.sys.SysAdminMapper" >
+
+
+    <!--查询房间组信息-->
+    <select id="findUserGroupsByAdminid" parameterType="int" resultType="cn.crm.entity.SysUsergroupEntity">
+          select a.* from  sys_usergroup a inner join sys_admin_usergroup b on a.usergroup_id = b. usergroup_id where b.admin_id= #{adminId}
+    </select>
+
+    <!--查询用户组信息 -->
+    <!--<select id="findRoomsGroupsByAdminid" parameterType="int" resultType="cn.crm.entity.SysAdminRoomgroupEntity">-->
+          <!--select a.* from  sys_roomgroup a inner join sys_admin_roomgroup b on a.roomgroup_id = b. roomgroup_id where b.admin_id= #{adminId}-->
+    <!--</select>-->
+
+    <!--根据管理员查询自己创建的角色-->
+    <select id="findRoleByAdminAuth" parameterType="int"  resultType="cn.crm.entity.SysRoleEntity">
+      SELECT * from sys_role where role_createId = #{adminId}
+    </select>
+
+</mapper>

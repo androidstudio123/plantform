@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.crm.mapper.sys.SysAdminRoomgroupMapper" >
+
+
+    <!--根据adminId查询所管理的分组-->
+    <select id="findRoomGroupIdsByAdminId" resultType="integer">
+        SELECT roomGroup_id FROM sys_admin_roomgroup WHERE admin_id = #{adminId}
+        <if test="state != null">
+            and state =#{state}
+        </if>
+    </select>
+	
+	
+</mapper>

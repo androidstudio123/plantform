@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.crm.mapper.sys.SysRoomgroupMapper" >
+
+
+
+    <!--根据管理员id查询对应的房间组-->
+    <select id="findAdminRoomgroup" resultType="cn.crm.entity.SysRoomgroupEntity" parameterType="java.lang.Integer">
+       SELECT  a.* FROM sys_roomgroup a
+       inner join sys_admin_roomgroup b on a.roomGroup_id = b.roomGroup_id
+       where b.admin_id = #{adminId}
+    </select>
+
+</mapper>

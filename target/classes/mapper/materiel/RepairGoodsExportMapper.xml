@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.crm.mapper.materiel.RepairGoodsExportMapper" >
+	
+	<select id="findExportRecordCount" resultType="cn.crm.entity.materiel.RepairGoodsExportEntity">
+        SELECT *,COUNT(export_id) as count_num
+        FROM repair_goods_export
+        GROUP BY goods_name,goods_type_id,repertory_name_id,repertory_type_id,producer_id
+        HAVING 1=1 and flag = 0
+        <if test="goods_name != null">
+           and goods_name like CONCAT("%",#{goods_name}, "%")
+        </if>
+        <if test="producer_id !=null">
+           and producer_id = #{producer_id}
+        </if>
+        <if test="repertory_name_id !=null">
+           and repertory_name_id = #{repertory_name_id}
+        </if>
+        <if test="goods_type_id !=null">
+            and goods_type_id = #{goods_type_id}
+        </if>
+        <if test="repertory_type_id !=null">
+            and repertory_type_id = #{repertory_type_id}
+        </if>
+    </select>
+    <select id="findExportSumCount" resultType="cn.crm.entity.materiel.RepairGoodsExportEntity">
+        SELECT *,SUM(goods_num) as sum_num
+        FROM repair_goods_export
+        GROUP BY goods_name,goods_type_id,repertory_name_id,repertory_type_id,producer_id
+        HAVING 1=1 and flag = 0
+        <if test="goods_name != null">
+            and goods_name like CONCAT("%",#{goods_name}, "%")
+        </if>
+        <if test="producer_id !=null">
+            and producer_id = #{producer_id}
+        </if>
+        <if test="repertory_name_id !=null">
+            and repertory_name_id = #{repertory_name_id}
+        </if>
+        <if test="goods_type_id !=null">
+            and goods_type_id = #{goods_type_id}
+        </if>
+        <if test="repertory_type_id !=null">
+            and repertory_type_id = #{repertory_type_id}
+        </if>
+    </select>
+    <select id="findSum" resultType="int">
+        select sum(goods_num) from repair_goods_export where flag = 0
+    </select>
+    <select id="findCount" resultType="int">
+        select count(0) from repair_goods_export where flag = 1
+    </select>
+</mapper>

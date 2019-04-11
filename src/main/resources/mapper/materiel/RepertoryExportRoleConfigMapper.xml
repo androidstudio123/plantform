@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.crm.mapper.materiel.RepertoryExportRoleConfigMapper" >
+
+    <!--根据其对应的出库角色信息查询其管理的库信息-->
+    <select id="findByExportRoleId" resultType="cn.crm.entity.materiel.RepertoryExportRoleConfigEntity">
+        SELECT
+            *
+        FROM
+            repertory_export_role_config
+        WHERE
+            export_role_id IN
+        <foreach collection="exportRole" item="role" index="index" open="(" close=")" separator=",">
+            #{role.export_role_id}
+        </foreach>
+    </select>
+	
+	
+</mapper>

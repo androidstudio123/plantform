@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.crm.mapper.sys.SysRoleFuncMapper" >
+
+
+
+
+    <!--根据角色id查询角色对应的资源名称-->
+    <select id="findFunByRoleid" parameterType="java.lang.Integer" resultType="cn.crm.entity.SysFuncEntity">
+        select  a.* from  sys_func a
+        inner join sys_role_func b on a.fun_id = b.fun_id
+        where  b.role_id = #{roleId} and b.state = 1
+    </select>
+
+
+</mapper>

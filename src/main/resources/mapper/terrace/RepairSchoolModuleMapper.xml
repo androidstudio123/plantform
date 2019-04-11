@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.crm.mapper.terrace.RepairSchoolModuleMapper">
+    <!--根据学校ids查询对应模块ids-->
+    <select id="findModuleId" resultType="integer" parameterType="list">
+             select module_id from  repair_school_module where school_id in
+        <foreach collection="school_id" item="schoolId" index="index" open="(" close=")" separator=",">
+            #{schoolId}
+        </foreach>
+         </select>
+
+    <!--根据学校id查询对应模块ids-->
+    <select id="findAppModuleId" resultType="integer" parameterType="int">
+             select module_id from  repair_school_module where school_id =#{school_id}
+         </select>
+</mapper>

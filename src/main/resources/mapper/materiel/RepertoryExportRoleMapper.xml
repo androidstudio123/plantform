@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.crm.mapper.materiel.RepertoryExportRoleMapper" >
+
+    <!-- 根据管理员id查询他管理的所有库管角色信息 -->
+    <select id="findExportRoleByAdmin" resultType="map">
+        <!-- a repertory_export_role 库管角色表 -->
+        <!-- b repertory_export_role_config 库管角色配置表 -->
+        <!-- c repair_goods_ repertory_name 库名称表 -->
+        <!-- d repair_goods_repertory_type 库类型表  -->
+        SELECT
+            a.*,
+            GROUP_CONCAT( DISTINCT (c.repertory_name) ) AS repertory_name,
+            GROUP_CONCAT( DISTINCT (d.repertory_type_name) ) AS repertory_type_name
+        FROM
+            repertory_export_role AS a
+            LEFT JOIN repertory_export_role_config AS b ON a.export_role_id = b.export_role_id
+            LEFT JOIN `repair_goods_ repertory_name` AS c ON b.repertory_name_id = c.repertory_name_id
+            LEFT JOIN repair_goods_repertory_type AS d ON b.repertory_type_id = d.repertory_type_id
+        WHERE
+            a.create_admin_id IN
+            <foreach collection="set" item="adminId" index="index" open="(" close=")" separator=",">
+                #{adminId}
+            </foreach>
+        <if test="exportRoleName != null">
+            AND a.export_role_name  like CONCAT("%",#{exportRoleName},"%")
+        </if>
+
+	    GROUP BY a.export_role_id
+    </select>
+
+    <!--查询指定库管角色的详情-->
+    <select id="findExportRoleDetail" resultType="map">
+         SELECT
+            a.*,
+            b.*,
+            c.repertory_name,
+            d.repertory_type_name
+        FROM
+            repertory_export_role AS a
+            LEFT JOIN repertory_export_role_config AS b ON a.export_role_id = b.export_role_id
+            LEFT JOIN `repair_goods_ repertory_name` AS c ON b.repertory_name_id = c.repertory_name_id
+            LEFT JOIN repair_goods_repertory_type AS d ON b.repertory_type_id = d.repertory_type_id
+        WHERE
+            a.export_role_id = #{roleId}
+    </select>
+
+    <!-- 根据管理员id查询所有的库管角色信息 -->
+    <select id="findExportRoleByAdmind" resultType="map">
+        SELECT
+        *
+        FROM
+        repertory_export_role
+        WHERE
+        create_admin_id IN
+        <foreach collection="set" item="adminId" index="index" open="(" close=")" separator=",">
+            #{adminId}
+        </foreach>
+        GROUP BY export_role_id
+    </select>
+
+    <!--根据管理员ID查询其拥有的出库角色-->
+    <select id="findExportRoleByAdminId" resultType="cn.crm.entity.materiel.RepertoryExportRoleEntity">
+        SELECT
+            b.*
+        FROM
+            sys_admin AS a
+            INNER JOIN repertory_export_role AS b ON a.export_role_id = b.export_role_id
+        WHERE
+            a.admin_id IN
+        <foreach collection="set" item="adminId" index="index" open="(" close=")" separator=",">
+            #{adminId}
+        </foreach>
+    </select>
+
+</mapper>
